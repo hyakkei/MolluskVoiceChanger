@@ -1,0 +1,7 @@
+build/
+Desktop.ini
+*.user
+.vs/
+release/
+.claude/
+AGENTS.md
