@@ -28,6 +28,7 @@ public:
     void setLevelDb(float db)      { levelDb = db; }
     void setGateOpen(bool open)    { gateOpen = open; }
     void setThresholdDb(float db)  { thresholdDb = db; }
+    void setShowGateLed(bool show) { showGateLed = show; }
 
     void paint(juce::Graphics& g) override
     {
@@ -60,26 +61,30 @@ public:
             g.fillRoundedRectangle(barBounds.withWidth(fillW), 3.0f);
         }
 
-        // ---- Threshold marker (vertical white line) ----
-        const float threshX = barBounds.getX() + dbToX(thresholdDb);
-        g.setColour(juce::Colours::white.withAlpha(0.85f));
-        g.drawLine(threshX, barBounds.getY() + 1.0f,
-                   threshX, barBounds.getBottom() - 1.0f, 2.0f);
+        if (showGateLed)
+        {
+            // ---- Threshold marker (vertical white line) ----
+            const float threshX = barBounds.getX() + dbToX(thresholdDb);
+            g.setColour(juce::Colours::white.withAlpha(0.85f));
+            g.drawLine(threshX, barBounds.getY() + 1.0f,
+                       threshX, barBounds.getBottom() - 1.0f, 2.0f);
 
-        // ---- Gate LED ----
-        auto ledArea   = bounds;
-        auto ledBounds = ledArea.removeFromRight(ledSize).reduced(2.0f);
-        g.setColour(gateOpen ? juce::Colour(0xff44ff44)
-                             : juce::Colour(0xff444444));
-        g.fillEllipse(ledBounds);
-        g.setColour(juce::Colours::black.withAlpha(0.4f));
-        g.drawEllipse(ledBounds, 1.0f);
+            // ---- Gate LED ----
+            auto ledArea   = bounds;
+            auto ledBounds = ledArea.removeFromRight(ledSize).reduced(2.0f);
+            g.setColour(gateOpen ? juce::Colour(0xff44ff44)
+                                 : juce::Colour(0xff444444));
+            g.fillEllipse(ledBounds);
+            g.setColour(juce::Colours::black.withAlpha(0.4f));
+            g.drawEllipse(ledBounds, 1.0f);
+        }
     }
 
 private:
     float levelDb     = -100.0f;
     float thresholdDb =  -40.0f;
     bool  gateOpen    = false;
+    bool  showGateLed = true;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeter)
 };

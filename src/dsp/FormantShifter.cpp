@@ -40,21 +40,43 @@ void FormantShifter::prepare(const juce::dsp::ProcessSpec&)
 
 void FormantShifter::reset()
 {
-    std::fill(inputFifo.begin(),  inputFifo.end(),  0.0f);
+    // inputFifo / inputWritePos preserved for pre-roll (see PitchShifter::reset)
     std::fill(outputFifo.begin(), outputFifo.end(), 0.0f);
     std::fill(fftBuf.begin(),     fftBuf.end(),     std::complex<float>(0, 0));
     std::fill(specBuf.begin(),    specBuf.end(),     std::complex<float>(0, 0));
     std::fill(cepBuf.begin(),     cepBuf.end(),      std::complex<float>(0, 0));
 
-    inputWritePos   = 0;
+    // inputFifo / inputWritePos preserved for pre-roll (see PitchShifter::reset)
     outputReadPos   = 0;
-    outputWritePos  = fftSize;  // initial latency = fftSize samples
+    outputWritePos  = fftSize;
     newSamplesCount = 0;
+    warmupCounter   = fftSize;
 }
 
 void FormantShifter::process(juce::AudioBuffer<float>& buffer)
 {
     if (!enabled.load()) return;
+
+    const bool wantPassthrough = std::abs(semitones.load()) < passthroughThreshold;
+
+    if (wantPassthrough)
+    {
+        if (fadeState == FadeState::Active || fadeState == FadeState::FadingIn)
+            fadeState = FadeState::FadingOut;
+    }
+    else
+    {
+        if (fadeState == FadeState::Passthrough)
+        {
+            reset();
+            fadeState = FadeState::FadingIn;
+            fadeGain  = 0.0f;
+        }
+        else if (fadeState == FadeState::FadingOut)
+        {
+            fadeState = FadeState::FadingIn;  // reverse fade, no reset
+        }
+    }
 
     const int numSamples  = buffer.getNumSamples();
     const int numChannels = buffer.getNumChannels();
@@ -62,8 +84,14 @@ void FormantShifter::process(juce::AudioBuffer<float>& buffer)
 
     for (int i = 0; i < numSamples; ++i)
     {
-        inputFifo[inputWritePos] = ch0[i];
+        const float dry = ch0[i];
+
+        // Always feed inputFifo so it holds recent audio for clean FFT pre-roll
+        inputFifo[inputWritePos] = dry;
         inputWritePos = (inputWritePos + 1) & fifoMask;
+
+        if (fadeState == FadeState::Passthrough)
+            continue;  // ch0[i] unchanged; inputFifo updated above
 
         if (++newSamplesCount >= hopSize)
         {
@@ -71,9 +99,32 @@ void FormantShifter::process(juce::AudioBuffer<float>& buffer)
             processFrame();
         }
 
-        ch0[i] = outputFifo[outputReadPos];
+        float out = outputFifo[outputReadPos];
         outputFifo[outputReadPos] = 0.0f;
         outputReadPos = (outputReadPos + 1) & fifoMask;
+
+        if (fadeState == FadeState::FadingIn)
+        {
+            if (warmupCounter > 0)
+            {
+                --warmupCounter;
+                out = dry;  // output dry while FFT output is not yet valid
+            }
+            else
+            {
+                fadeGain += fadeInc;
+                if (fadeGain >= 1.0f) { fadeGain = 1.0f; fadeState = FadeState::Active; }
+                out = dry + fadeGain * (out - dry);  // lerp(dry, fft, fadeGain)
+            }
+        }
+        else if (fadeState == FadeState::FadingOut)
+        {
+            fadeGain -= fadeInc;
+            if (fadeGain <= 0.0f) { fadeGain = 0.0f; fadeState = FadeState::Passthrough; }
+            out = dry + fadeGain * (out - dry);  // lerp(dry, fft, fadeGain)
+        }
+
+        ch0[i] = out;
     }
 
     for (int ch = 1; ch < numChannels; ++ch)

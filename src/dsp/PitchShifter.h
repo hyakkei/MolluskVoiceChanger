@@ -78,5 +78,14 @@ private:
     std::atomic<float> semitones { 0.0f };
     std::atomic<bool>  enabled   { true };
 
+    static constexpr float passthroughThreshold = 0.1f;
+    static constexpr int   fadeSamples          = 1024;
+    static constexpr float fadeInc              = 1.0f / fadeSamples;
+
+    enum class FadeState { Passthrough, FadingIn, Active, FadingOut };
+    FadeState fadeState    = FadeState::Passthrough;
+    float     fadeGain     = 0.0f;
+    int       warmupCounter = 0;  // counts down while FFT output is not yet valid
+
     JUCE_DECLARE_NON_COPYABLE(PitchShifter)
 };

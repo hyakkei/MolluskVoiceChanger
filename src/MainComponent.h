@@ -59,6 +59,7 @@ private:
 
     // Shared state between audio thread and UI thread
     std::atomic<float> inputLevelDb  { -100.0f };
+    std::atomic<float> outputLevelDb { -100.0f };
     std::atomic<bool>  globalBypass  { false };
 
     // ---- Preset management ----

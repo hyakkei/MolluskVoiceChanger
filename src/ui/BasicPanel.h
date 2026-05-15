@@ -34,8 +34,11 @@ public:
     void syncKnobs(float sensitivity, float pitch, float brightness,
                    float bubble,      float slimy,  float lofi, float volume);
 
-    // ---- Level meter ----
-    LevelMeter levelMeter;
+    // ---- Level meters ----
+    LevelMeter   levelMeter;
+    LevelMeter   outputLevelMeter;
+    juce::Label  inputMeterLabel;
+    juce::Label  outputMeterLabel;
 
     // ---- Knobs ----
     struct Knob

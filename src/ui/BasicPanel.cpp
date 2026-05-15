@@ -20,7 +20,16 @@ static juce::String jp(const char* utf8) { return juce::String::fromUTF8(utf8); 
 
 BasicPanel::BasicPanel()
 {
+    inputMeterLabel.setText("INPUT", juce::dontSendNotification);
+    inputMeterLabel.setJustificationType(juce::Justification::centredRight);
+    addAndMakeVisible(inputMeterLabel);
     addAndMakeVisible(levelMeter);
+
+    outputMeterLabel.setText("OUTPUT", juce::dontSendNotification);
+    outputMeterLabel.setJustificationType(juce::Justification::centredRight);
+    addAndMakeVisible(outputMeterLabel);
+    outputLevelMeter.setShowGateLed(false);
+    addAndMakeVisible(outputLevelMeter);
 
     setupKnob(bkSensitivity, "INPUT\nSENSITIVITY", jp(u8"にゅうりょくかんど"),  -80.0,  0.0, -40.0, 1.0,  " dB");
     setupKnob(bkPitch,       "PITCH",               jp(u8"たかさ"),       0.0,  12.0,   0.0, 0.5,  " st");
@@ -82,8 +91,23 @@ void BasicPanel::resized()
 
 void BasicPanel::layoutIn(juce::Rectangle<int> area)
 {
-    levelMeter.setBounds(area.removeFromTop(26));
-    area.removeFromTop(8);
+    constexpr int labelW   = 60;
+    constexpr int labelGap = 4;
+    constexpr int meterH   = 26;
+    {
+        auto row = area.removeFromTop(meterH);
+        inputMeterLabel.setBounds(row.removeFromLeft(labelW));
+        row.removeFromLeft(labelGap);
+        levelMeter.setBounds(row);
+    }
+    area.removeFromTop(4);
+    {
+        auto row = area.removeFromTop(meterH);
+        outputMeterLabel.setBounds(row.removeFromLeft(labelW));
+        row.removeFromLeft(labelGap);
+        outputLevelMeter.setBounds(row);
+    }
+    area.removeFromTop(4);
 
     const int totalW  = area.getWidth();
     const int cellW   = totalW / 4;   // 4 columns fill the full width

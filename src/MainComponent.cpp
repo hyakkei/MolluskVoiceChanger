@@ -223,6 +223,13 @@ void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& buffer
     if (!globalBypass.load())
         effectChain.process(mono);
 
+    // Measure peak output level (after effects) for output VU meter
+    float outPeak = 0.0f;
+    const float* out = mono.getReadPointer(0);
+    for (int i = 0; i < numSamp; ++i)
+        outPeak = std::max(outPeak, std::abs(out[i]));
+    outputLevelDb.store(juce::Decibels::gainToDecibels(outPeak, -100.0f));
+
     for (int ch = 0; ch < buffer->getNumChannels(); ++ch)
         buffer->copyFrom(ch, start, mono, 0, 0, numSamp);
 }
@@ -504,7 +511,7 @@ void MainComponent::setBasicMode(bool isBasic)
     basic.setVisible(isBasic);
     advViewport.setVisible(!isBasic);
 
-    setSize(580, isBasic ? 485 : 850);
+    setSize(580, isBasic ? 515 : 850);
     resized();
 }
 
@@ -514,6 +521,9 @@ void MainComponent::timerCallback()
     basic.levelMeter.setGateOpen(effectChain.gate.getGateGain() > 0.5f);
     basic.levelMeter.setThresholdDb(effectChain.gate.getThresholdDb());
     basic.levelMeter.repaint();
+
+    basic.outputLevelMeter.setLevelDb(outputLevelDb.load());
+    basic.outputLevelMeter.repaint();
 }
 
 void MainComponent::paint(juce::Graphics& g)
