@@ -16,10 +16,12 @@
 
 - **4種のプリセット** — Squid Girl / Squid Boy / Octopus Girl / Octopus Boy
 - **Basic モード** — ロータリーノブで主要パラメータを直感的に操作
+  - INPUT / OUTPUT レベルメーターをリアルタイム表示
 - **Advanced モード** — 各エフェクトを個別に細かく調整（縦スクロール対応）
 - **DSP パイプライン**
   - Noise Gate → High Pass Filter → Pitch Shifter → Formant Shifter
   - LFO Filter → Phaser → Band Pass Filter → Output Gain
+- **低レイテンシ パススルー** — PITCH / BRIGHTNESS が 0 のとき FFT 処理をスキップし、遷移時はクロスフェードで滑らかに切り替え
 - **セッション保持** — 終了時に設定を自動保存し、次回起動時に復元
 - **プリセット エクスポート / インポート** — XML 形式で設定を保存・共有
 
@@ -77,6 +79,8 @@ cmake --build build --config Release
 ## 使い方
 
 ### Basic モード
+
+画面上部に INPUT（エフェクト前）と OUTPUT（エフェクト後）のレベルメーターを表示します。
 
 | ノブ | 説明 |
 |------|------|

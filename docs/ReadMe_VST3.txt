@@ -1,5 +1,5 @@
 ================================================================
-  Mollusk Voice Changer  VST3 Plugin  v1.0.0
+  Mollusk Voice Changer  VST3 Plugin  v1.1.0
   © 2026 Ito Hyakkei
 ================================================================
 
@@ -61,6 +61,9 @@
     から好みのキャラクターを選択する。
 
   ■ Basic モード（デフォルト）
+    画面上部の 2 本のレベルメーターで入出力の音量を確認できる。
+    （INPUT: エフェクト前、OUTPUT: エフェクト後）
+
     7 つのノブで音声を調整する。
 
       INPUT SENSITIVITY  マイクの感度（ノイズゲート）
@@ -124,7 +127,7 @@
 ----------------------------------------------------------------
 ================================================================
 
-  Mollusk Voice Changer  VST3 Plugin  v1.0.0
+  Mollusk Voice Changer  VST3 Plugin  v1.1.0
   © 2026 Ito Hyakkei
 
 ================================================================
@@ -184,6 +187,10 @@
     Squid Girl / Squid Boy / Octopus Girl / Octopus Boy.
 
   ■ Basic Mode (default)
+    Two level meters at the top of the screen show input and
+    output levels in real time.
+    (INPUT: before effects, OUTPUT: after effects)
+
     Adjust your voice with 7 knobs:
 
       INPUT SENSITIVITY  Microphone sensitivity (noise gate)
