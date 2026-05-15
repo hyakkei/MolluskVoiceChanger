@@ -31,11 +31,11 @@
 
 | 項目 | 要件 |
 |------|------|
-| OS | Windows 10 / 11 |
-| 仮想オーディオデバイス | [VB-CABLE](https://vb-audio.com/Cable/) |
-| 通話/配信アプリ | 入力デバイスに VB-CABLE を設定 |
+| OS | Windows 10 / 11 / macOS|
+| 仮想オーディオデバイス(Win) | [VB-CABLE](https://vb-audio.com/Cable/) |
+| 仮想オーディオデバイス(Mac) | [BlackHole](https://existential.audio/blackhole/) |
+| 通話/配信アプリ | 入力デバイスに 仮想オーディオデバイス を設定 |
 
-> macOS 向けビルドも対応していますが、動作確認は Windows のみです。
 
 ---
 
@@ -68,11 +68,11 @@ cmake --build build --config Release
 
 ## セットアップ
 
-1. **VB-CABLE** をインストールし、PCを再起動します。
+1. **仮想オーディオデバイス** をインストールし、PCを再起動します。
 2. アプリを起動し、**AUDIO SETTINGS** から以下を設定します。
    - 入力デバイス: マイク
-   - 出力デバイス: CABLE Input (VB-Audio Virtual Cable)
-3. 通話/配信アプリ の設定 入力デバイスを **CABLE Output** に変更します。
+   - 出力デバイス: 仮想オーディオデバイス Input
+3. 通話/配信アプリ の設定 入力デバイスを **仮想オーディオデバイス Output** に変更します。
 
 ---
 
