@@ -31,9 +31,10 @@
 
 | 項目 | 要件 |
 |------|------|
-| OS | Windows 10 / 11 / macOS|
+| OS | Windows 10 / 11 / macOS / Linux (glibc 2.35以上) |
 | 仮想オーディオデバイス(Win) | [VB-CABLE](https://vb-audio.com/Cable/) |
 | 仮想オーディオデバイス(Mac) | [BlackHole](https://existential.audio/blackhole/) |
+| 仮想オーディオデバイス(Linux) | JACK / PipeWire |
 | 通話/配信アプリ | 入力デバイスに 仮想オーディオデバイス を設定 |
 
 
@@ -46,8 +47,9 @@
 - CMake 3.22 以上
 - Visual Studio 2022（Windows）または Xcode（macOS）
 - Git
+- Linux の場合: Ubuntu 22.04 LTS 以上を推奨（glibc 2.35 以上の環境でビルドすると互換性が高い）
 
-### 手順
+### Windows / macOS
 
 ```bash
 # リポジトリをクローン
@@ -57,12 +59,34 @@ cd MolluskVoiceChanger
 # JUCE サブモジュールを取得
 git submodule update --init --recursive
 
-# ビルド（Windows）
+# ビルド
 cmake -B build
 cmake --build build --config Release
 ```
 
 ビルド成果物は `build/MolluskVoiceChanger_artefacts/Release/` に生成されます。
+
+### Linux
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/hyakkei/MolluskVoiceChanger.git
+cd MolluskVoiceChanger
+
+# JUCE サブモジュールを取得
+git submodule update --init --recursive
+
+# ビルド（依存パッケージの自動インストールを含む）
+bash scripts/build-linux.sh
+
+# 配布用パッケージの生成（AppImage・VST3アーカイブ）（任意）
+bash scripts/package-linux.sh
+```
+
+ビルド成果物は `build-linux/` に、配布用パッケージは `release/linux/` に生成されます。
+
+> **互換性について**: 幅広い Linux 環境への配布には Ubuntu 22.04 LTS 以上でのビルドを推奨します。
+> 生成される AppImage は glibc 2.35 以上の環境であればディストリビューションを問わず動作します。
 
 ---
 
